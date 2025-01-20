@@ -1,25 +1,61 @@
 pipeline {
     agent any
+
+    environment {
+        // Set your environment variables here if needed (like npm registry, etc.)
+    }
+
     stages {
-        stage('Install Dependencies') {
+        stage('Checkout') {
             steps {
-                bat 'npm install'
+                checkout scm
             }
         }
-        stage('Run Tests') {
+        
+        stage('Install') {
             steps {
-                bat 'npm test'
+                dir('your-react-app-folder') { 
+                    script {
+                        // Run npm install to install dependencies
+                        bat 'npm install'
+                    }
+                }
             }
         }
-        stage('Build Project') {
+
+        stage('Lint') {
             steps {
-                bat 'npm run build'
+                dir('your-react-app-folder') {
+                    script {
+                        // Run linting
+                        bat 'npm run lint'
+                    }
+                }
             }
         }
-        stage('Deploy Application') {
+
+        stage('Build') {
             steps {
-                bat 'xcopy /E /I /Y build \\path\\to\\deploy\\directory'
+                dir('your-react-app-folder') {
+                    script {
+                        // Run build to create production-ready files
+                        bat 'npm run build'
+                    }
+                }
             }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Deploy your app (this could be FTP, SSH, or any other deployment mechanism)
+                echo 'Deploy successful!'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Build and deployment completed!'
         }
     }
 }
