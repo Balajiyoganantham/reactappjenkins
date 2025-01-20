@@ -1,53 +1,59 @@
 pipeline {
     agent any
-
+    
     stages {
-        stage('Checkout') {
+        stage('Clone Repository') {
             steps {
-                checkout scm
+                git 'https://github.com/Balajiyoganantham/reactappjenkins.git'
             }
         }
         
-        stage('Install') {
+        stage('Install Dependencies') {
             steps {
-                dir('your-react-app-folder') { 
-                    script {
-                        bat 'npm install'
-                    }
+                script {
+                    sh 'npm install'
+                }
+            }
+        }
+        
+        stage('Run Tests') {
+            steps {
+                script {
+                    sh 'npm test -- --ci --reporters=default --reporters=jest-stare'
+                }
+            }
+        }
+        
+        stage('Build Project') {
+            steps {
+                script {
+                    sh 'npm run build'
+                }
+            }
+        }
+        
+        stage('Deploy Application') {
+            steps {
+                script {
+                    sh 'cp -r build /path/to/deployment/directory'
                 }
             }
         }
 
-        stage('Lint') {
+        stage('Lint Code') {
             steps {
-                dir('your-react-app-folder') {
-                    script {
-                        bat 'npm run lint'
-                    }
+                script {
+                    sh 'npx eslint .'
                 }
             }
         }
-
-        stage('Build') {
+        
+        stage('Post-Deployment Test') {
             steps {
-                dir('your-react-app-folder') {
-                    script {
-                        bat 'npm run build'
-                    }
+                script {
+                    sh 'curl -f http://localhost:3000 || exit 1'
                 }
             }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploy successful!'
-            }
-        }
-    }
-
-    post {
-        always {
-            echo 'Build and deployment completed!'
         }
     }
 }
