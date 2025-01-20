@@ -1,0 +1,75 @@
+pipeline {
+    agent any
+
+    environment {
+        NODE_HOME = tool 'NodeJS' // NodeJS configured in Jenkins
+        PATH = "${NODE_HOME}/bin:${env.PATH}"
+    }
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                // Cloning the React project
+                git 'https://github.com/your-username/my-react-app.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                // Install project dependencies
+                sh 'npm install'
+            }
+        }
+
+        stage('Linting') {
+            steps {
+                // Run ESLint to check for code issues
+                sh 'npx eslint .'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                // Run React app tests
+                sh 'npm test -- --watchAll=false'
+            }
+        }
+
+        stage('Build Project') {
+            steps {
+                // Build the React app
+                sh 'npm run build'
+            }
+        }
+
+        stage('Deploy Application') {
+            steps {
+                // Deploy the application by copying build files
+                sh '''
+                DEPLOY_DIR=/var/www/html/react-app
+                mkdir -p $DEPLOY_DIR
+                cp -r build/* $DEPLOY_DIR
+                '''
+            }
+        }
+
+        stage('Post-Deployment Testing') {
+            steps {
+                // Verify if the app is running using curl
+                sh 'curl -I http://localhost/react-app'
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline completed!'
+        }
+        success {
+            echo 'Pipeline succeeded!'
+        }
+        failure {
+            echo 'Pipeline failed!'
+        }
+    }
+}
