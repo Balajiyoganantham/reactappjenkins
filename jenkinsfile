@@ -1,10 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        // Set your environment variables here if needed (like npm registry, etc.)
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -16,7 +12,6 @@ pipeline {
             steps {
                 dir('your-react-app-folder') { 
                     script {
-                        // Run npm install to install dependencies
                         bat 'npm install'
                     }
                 }
@@ -27,7 +22,6 @@ pipeline {
             steps {
                 dir('your-react-app-folder') {
                     script {
-                        // Run linting
                         bat 'npm run lint'
                     }
                 }
@@ -38,7 +32,6 @@ pipeline {
             steps {
                 dir('your-react-app-folder') {
                     script {
-                        // Run build to create production-ready files
                         bat 'npm run build'
                     }
                 }
@@ -47,7 +40,6 @@ pipeline {
 
         stage('Deploy') {
             steps {
-                // Deploy your app (this could be FTP, SSH, or any other deployment mechanism)
                 echo 'Deploy successful!'
             }
         }
