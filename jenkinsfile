@@ -1,58 +1,40 @@
 pipeline {
     agent any
-    
+
     stages {
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/Balajiyoganantham/reactappjenkins.git'
-            }
-        }
-        
         stage('Install Dependencies') {
             steps {
-                script {
-                    bat 'npm install'
-                }
+                powershell 'npm install'
             }
         }
         
         stage('Run Tests') {
             steps {
-                script {
-                    bat 'npm test -- --ci --reporters=default --reporters=jest-stare'
-                }
+                powershell 'npm test'
             }
         }
         
         stage('Build Project') {
             steps {
-                script {
-                    bat 'npm run build'
-                }
+                powershell 'npm run build'
             }
         }
-        
+
         stage('Deploy Application') {
             steps {
-                script {
-                    bat 'xcopy /E /I build C:\\path\\to\\deployment\\directory'
-                }
+                powershell 'Copy-Item -Path build\\* -Destination "C:\\path\\to\\deployment\\directory" -Recurse -Force'
             }
         }
 
         stage('Lint Code') {
             steps {
-                script {
-                    bat 'npx eslint .'
-                }
+                powershell 'eslint .'
             }
         }
-        
+
         stage('Post-Deployment Test') {
             steps {
-                script {
-                    bat 'curl -f http://localhost:3000 || exit 1'
-                }
+                powershell 'curl http://localhost:3000'
             }
         }
     }
