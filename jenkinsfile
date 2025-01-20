@@ -1,75 +1,25 @@
 pipeline {
     agent any
-
-    environment {
-        DEPLOY_DIR = '/path/to/deployment/directory' // Replace with actual path
-    }
-
     stages {
-        stage('Clone Repository') {
-            steps {
-                git url: 'https://github.com/Balajiyoganantham/reactappjenkins.git', credentialsId: 'balaji_credentials'
-            }
-        }
-
         stage('Install Dependencies') {
             steps {
-                script {
-                    sh 'npm install'
-                }
+                bat 'npm install'
             }
         }
-
-        stage('Linting') {
-            steps {
-                script {
-                    sh 'npm run lint || echo "Linting errors detected"'
-                }
-            }
-        }
-
         stage('Run Tests') {
             steps {
-                script {
-                    sh 'npm test'
-                }
+                bat 'npm test'
             }
         }
-
         stage('Build Project') {
             steps {
-                script {
-                    sh 'npm run build'
-                }
+                bat 'npm run build'
             }
         }
-
         stage('Deploy Application') {
             steps {
-                script {
-                    sh """
-                    mkdir -p $DEPLOY_DIR
-                    cp -r build/* $DEPLOY_DIR
-                    """
-                }
+                bat 'xcopy /E /I /Y build \\path\\to\\deploy\\directory'
             }
-        }
-
-        stage('Post-Deployment Testing') {
-            steps {
-                script {
-                    sh 'curl -Is http://localhost:3000 | head -n 1'
-                }
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'Pipeline executed successfully!'
-        }
-        failure {
-            echo 'Pipeline failed. Please check the logs.'
         }
     }
 }
